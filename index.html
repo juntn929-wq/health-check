@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>身體資產健檢｜45歲後的第一份體檢報告</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* 財務儀表板美學：深墨綠 × 銅金 × 象牙白 */
+    --ink: #0F1A15;
+    --ink-2: #16241C;
+    --surface: #1B2C22;
+    --surface-2: #22362A;
+    --line: #2E4536;
+    --copper: #C08A3E;
+    --copper-bright: #E0A954;
+    --copper-dim: #6B5228;
+    --ivory: #F2EEE4;
+    --ivory-dim: rgba(242,238,228,0.55);
+    --ivory-faint: rgba(242,238,228,0.28);
+    --green: #4BA97A;
+    --amber: #D9A441;
+    --red: #C7654E;
+    --paper: #F2EEE4;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:'Noto Sans TC',sans-serif;
+    background:var(--ink);
+    color:var(--ivory);
+    line-height:1.8;
+    overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation:none !important; transition:none !important; }
+  }
+
+  /* ─────────── SCREEN SYSTEM ─────────── */
+  .screen { display:none; min-height:100vh; }
+  .screen.active { display:flex; flex-direction:column; }
+
+  /* ─────────── INTRO ─────────── */
+  #intro { align-items:center; justify-content:center; padding:40px 24px; position:relative; }
+  #intro::before {
+    content:''; position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(192,138,62,0.12) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 100%, rgba(75,169,122,0.06) 0%, transparent 50%);
+    pointer-events:none;
+  }
+  .intro-inner { max-width:560px; text-align:center; position:relative; z-index:1; }
+  .intro-mark {
+    font-family:'DM Mono',monospace; font-size:11px; letter-spacing:5px;
+    text-transform:uppercase; color:var(--copper); margin-bottom:32px;
+    opacity:0; animation:fadeUp 0.7s 0.1s forwards;
+  }
+  .intro-ticker {
+    display:inline-flex; align-items:center; gap:10px;
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:100px; padding:8px 18px; margin-bottom:32px;
+    font-family:'DM Mono',monospace; font-size:12px;
+    opacity:0; animation:fadeUp 0.7s 0.2s forwards;
+  }
+  .ticker-dot { width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:pulse 2s infinite; }
+  .ticker-up { color:var(--green); }
+  .intro-title {
+    font-family:'Noto Serif TC',serif; font-weight:900;
+    font-size:clamp(30px,7vw,52px); line-height:1.25; margin-bottom:20px;
+    opacity:0; animation:fadeUp 0.7s 0.3s forwards;
+  }
+  .intro-title .copper { color:var(--copper-bright); }
+  .intro-desc {
+    font-size:15px; color:var(--ivory-dim); font-weight:300;
+    line-height:2; margin-bottom:14px;
+    opacity:0; animation:fadeUp 0.7s 0.45s forwards;
+  }
+  .intro-meta {
+    display:flex; gap:24px; justify-content:center; margin:36px 0;
+    opacity:0; animation:fadeUp 0.7s 0.55s forwards;
+  }
+  .meta-item { text-align:center; }
+  .meta-num { font-family:'Noto Serif TC',serif; font-size:24px; font-weight:700; color:var(--copper-bright); }
+  .meta-label { font-size:11px; color:var(--ivory-faint); font-family:'DM Mono',monospace; letter-spacing:1px; margin-top:2px; }
+  .meta-divider { width:1px; background:var(--line); }
+  .btn-start {
+    display:inline-flex; align-items:center; gap:10px;
+    background:var(--copper); color:var(--ink);
+    border:none; border-radius:100px; padding:16px 40px;
+    font-family:'Noto Sans TC',sans-serif; font-size:16px; font-weight:700;
+    cursor:pointer; transition:all 0.25s;
+    box-shadow:0 8px 30px rgba(192,138,62,0.3);
+    opacity:0; animation:fadeUp 0.7s 0.7s forwards;
+  }
+  .btn-start:hover { background:var(--copper-bright); transform:translateY(-2px); box-shadow:0 12px 40px rgba(192,138,62,0.45); }
+  .btn-start:focus-visible { outline:3px solid var(--copper-bright); outline-offset:3px; }
+  .intro-fine { font-size:12px; color:var(--ivory-faint); margin-top:20px; opacity:0; animation:fadeUp 0.7s 0.8s forwards; }
+
+  /* ─────────── QUIZ ─────────── */
+  #quiz { padding:0; }
+  .quiz-top {
+    position:sticky; top:0; z-index:10;
+    background:rgba(15,26,21,0.92); backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+    padding:16px 24px;
+  }
+  .quiz-top-inner { max-width:640px; margin:0 auto; }
+  .progress-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .progress-label { font-family:'DM Mono',monospace; font-size:12px; color:var(--copper); letter-spacing:1px; }
+  .progress-count { font-family:'DM Mono',monospace; font-size:12px; color:var(--ivory-dim); }
+  .progress-track { height:4px; background:var(--line); border-radius:100px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--copper),var(--copper-bright)); border-radius:100px; width:0%; transition:width 0.4s cubic-bezier(0.4,0,0.2,1); }
+
+  .quiz-body { flex:1; display:flex; align-items:center; justify-content:center; padding:40px 24px; }
+  .question-card { max-width:640px; width:100%; }
+  .q-category {
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'DM Mono',monospace; font-size:11px; letter-spacing:2px;
+    text-transform:uppercase; color:var(--copper);
+    background:var(--surface); border:1px solid var(--line);
+    padding:5px 14px; border-radius:100px; margin-bottom:24px;
+  }
+  .q-text {
+    font-family:'Noto Serif TC',serif; font-size:clamp(22px,4.5vw,30px);
+    font-weight:700; line-height:1.5; margin-bottom:8px; color:var(--ivory);
+  }
+  .q-hint { font-size:14px; color:var(--ivory-dim); margin-bottom:32px; font-weight:300; }
+  .options { display:flex; flex-direction:column; gap:12px; }
+  .option {
+    display:flex; align-items:center; gap:16px;
+    background:var(--surface); border:1.5px solid var(--line);
+    border-radius:14px; padding:18px 22px;
+    cursor:pointer; transition:all 0.2s; text-align:left;
+    font-family:'Noto Sans TC',sans-serif; font-size:16px; color:var(--ivory);
+    width:100%;
+  }
+  .option:hover { border-color:var(--copper); background:var(--surface-2); transform:translateX(4px); }
+  .option:focus-visible { outline:3px solid var(--copper-bright); outline-offset:2px; }
+  .option-marker {
+    width:44px; height:44px; border-radius:12px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'DM Mono',monospace; font-size:18px; font-weight:500;
+    background:var(--ink-2); border:1px solid var(--line);
+    transition:all 0.2s;
+  }
+  .option:hover .option-marker { background:var(--copper); color:var(--ink); border-color:var(--copper); }
+  .option-text { flex:1; }
+  .option-sub { display:block; font-size:12px; color:var(--ivory-faint); font-family:'DM Mono',monospace; margin-top:2px; }
+
+  .quiz-nav { max-width:640px; margin:0 auto; padding:0 24px 32px; display:flex; justify-content:space-between; align-items:center; width:100%; }
+  .btn-back {
+    background:none; border:none; color:var(--ivory-dim);
+    font-family:'Noto Sans TC',sans-serif; font-size:14px; cursor:pointer;
+    display:flex; align-items:center; gap:6px; padding:8px 4px; transition:color 0.2s;
+  }
+  .btn-back:hover { color:var(--ivory); }
+  .btn-back:disabled { opacity:0.25; cursor:not-allowed; }
+  .btn-back:focus-visible { outline:2px solid var(--copper); outline-offset:2px; border-radius:4px; }
+
+  .q-anim { animation:cardIn 0.4s cubic-bezier(0.16,1,0.3,1); }
+
+  /* ─────────── CALCULATING ─────────── */
+  #calc { align-items:center; justify-content:center; padding:40px 24px; }
+  .calc-inner { text-align:center; }
+  .calc-ring { width:100px; height:100px; margin:0 auto 32px; position:relative; }
+  .calc-ring svg { transform:rotate(-90deg); }
+  .calc-ring circle { fill:none; stroke-width:6; }
+  .calc-track { stroke:var(--line); }
+  .calc-prog { stroke:var(--copper-bright); stroke-linecap:round; stroke-dasharray:283; stroke-dashoffset:283; animation:ringFill 2.2s ease-out forwards; }
+  .calc-text { font-family:'Noto Serif TC',serif; font-size:22px; color:var(--ivory); margin-bottom:8px; }
+  .calc-sub { font-family:'DM Mono',monospace; font-size:13px; color:var(--copper); letter-spacing:1px; }
+
+  /* ─────────── RESULT ─────────── */
+  #result { padding:0; }
+  .result-hero {
+    padding:56px 24px 40px; text-align:center; position:relative; overflow:hidden;
+    border-bottom:1px solid var(--line);
+  }
+  .result-hero::before {
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(ellipse at 50% 0%, rgba(192,138,62,0.15) 0%, transparent 60%);
+  }
+  .result-hero-inner { max-width:640px; margin:0 auto; position:relative; z-index:1; }
+  .result-mark { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--copper); margin-bottom:20px; }
+  .result-headline { font-family:'Noto Serif TC',serif; font-size:clamp(24px,5vw,34px); font-weight:900; line-height:1.4; margin-bottom:12px; }
+  .result-headline .copper { color:var(--copper-bright); }
+  .result-sub { font-size:14px; color:var(--ivory-dim); font-weight:300; }
+
+  .result-body { max-width:640px; margin:0 auto; padding:40px 24px 60px; width:100%; }
+
+  /* SCORE CARD */
+  .total-card {
+    background:linear-gradient(145deg,var(--surface),var(--ink-2));
+    border:1px solid var(--copper-dim); border-radius:20px;
+    padding:32px; margin-bottom:24px; text-align:center; position:relative; overflow:hidden;
+  }
+  .total-card::after {
+    content:''; position:absolute; top:-50%; right:-30%;
+    width:300px; height:300px; border:1px solid rgba(192,138,62,0.1); border-radius:50%;
+  }
+  .total-label { font-family:'DM Mono',monospace; font-size:12px; letter-spacing:2px; text-transform:uppercase; color:var(--copper); margin-bottom:16px; }
+  .total-score { font-family:'Noto Serif TC',serif; font-size:72px; font-weight:900; line-height:1; color:var(--copper-bright); }
+  .total-score small { font-size:24px; color:var(--ivory-dim); font-weight:400; }
+  .total-grade { display:inline-block; margin-top:16px; padding:6px 20px; border-radius:100px; font-size:14px; font-weight:700; font-family:'DM Mono',monospace; }
+  .grade-green { background:rgba(75,169,122,0.15); color:var(--green); border:1px solid rgba(75,169,122,0.35); }
+  .grade-amber { background:rgba(217,164,65,0.15); color:var(--amber); border:1px solid rgba(217,164,65,0.35); }
+  .grade-red { background:rgba(199,101,78,0.15); color:var(--red); border:1px solid rgba(199,101,78,0.35); }
+  .total-verdict { font-size:15px; color:var(--ivory); line-height:1.9; margin-top:20px; max-width:440px; margin-left:auto; margin-right:auto; }
+
+  /* DIMENSION CARDS */
+  .dim-title { font-family:'DM Mono',monospace; font-size:12px; letter-spacing:2px; text-transform:uppercase; color:var(--ivory-faint); margin:32px 0 16px; }
+  .dim-card { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:24px; margin-bottom:14px; }
+  .dim-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px; }
+  .dim-name { font-family:'Noto Serif TC',serif; font-size:18px; font-weight:700; display:flex; align-items:center; gap:10px; }
+  .dim-icon { font-size:20px; }
+  .dim-score { font-family:'DM Mono',monospace; font-size:15px; font-weight:500; }
+  .dim-bar-track { height:10px; background:var(--ink-2); border-radius:100px; overflow:hidden; margin-bottom:14px; }
+  .dim-bar-fill { height:100%; border-radius:100px; width:0%; transition:width 1s cubic-bezier(0.4,0,0.2,1); }
+  .dim-verdict { font-size:14px; color:var(--ivory-dim); line-height:1.85; }
+  .dim-verdict strong { color:var(--ivory); }
+
+  /* CTA */
+  .result-cta {
+    background:linear-gradient(145deg,var(--copper),#A8752F);
+    border-radius:20px; padding:36px 32px; margin-top:36px; text-align:center;
+    position:relative; overflow:hidden;
+  }
+  .result-cta::before {
+    content:''; position:absolute; top:-40%; left:-20%;
+    width:250px; height:250px; border:1px solid rgba(15,26,21,0.15); border-radius:50%;
+  }
+  .cta-inner { position:relative; z-index:1; }
+  .cta-title { font-family:'Noto Serif TC',serif; font-size:22px; font-weight:900; color:var(--ink); margin-bottom:12px; line-height:1.5; }
+  .cta-desc { font-size:15px; color:rgba(15,26,21,0.8); line-height:1.9; margin-bottom:24px; }
+  .cta-desc strong { color:var(--ink); }
+  .cta-qr {
+    width:140px; height:140px; margin:0 auto 20px;
+    background:var(--ivory); border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'DM Mono',monospace; font-size:12px; color:rgba(15,26,21,0.5); text-align:center;
+    padding:12px; line-height:1.5;
+  }
+  .btn-line {
+    display:inline-flex; align-items:center; gap:10px;
+    background:var(--ink); color:var(--ivory);
+    border:none; border-radius:100px; padding:15px 36px;
+    font-family:'Noto Sans TC',sans-serif; font-size:16px; font-weight:700;
+    cursor:pointer; transition:all 0.25s; text-decoration:none;
+  }
+  .btn-line:hover { background:var(--ink-2); transform:translateY(-2px); }
+  .cta-fine { font-size:12px; color:rgba(15,26,21,0.6); margin-top:16px; }
+
+  .result-restart {
+    display:block; margin:24px auto 0; background:none; border:1px solid var(--line);
+    color:var(--ivory-dim); border-radius:100px; padding:10px 24px;
+    font-family:'Noto Sans TC',sans-serif; font-size:13px; cursor:pointer; transition:all 0.2s;
+  }
+  .result-restart:hover { border-color:var(--copper); color:var(--ivory); }
+
+  .result-disclaimer { font-size:12px; color:var(--ivory-faint); text-align:center; margin-top:32px; line-height:1.7; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes cardIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+  @keyframes ringFill { to { stroke-dashoffset:40; } }
+  @keyframes scoreIn { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+
+  .fade-in { animation:fadeUp 0.6s forwards; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ INTRO ═══════════ -->
+<section class="screen active" id="intro">
+  <div class="intro-inner">
+    <div class="intro-mark">Body Asset Health Check</div>
+    <div class="intro-ticker">
+      <span class="ticker-dot"></span>
+      <span>你的身體資產　<span class="ticker-up">▲ 尚未評估</span></span>
+    </div>
+    <h1 class="intro-title">你會定期檢查股票，<br><span class="copper">那身體呢？</span></h1>
+    <p class="intro-desc">很多人每季檢視投資組合，卻從沒認真檢查過自己的身體。這份檢查表，幫你用 2 分鐘看見自己 45 歲後最重要的一項資產——身體，現在的真實狀態。</p>
+    <div class="intro-meta">
+      <div class="meta-item"><div class="meta-num">10</div><div class="meta-label">題</div></div>
+      <div class="meta-divider"></div>
+      <div class="meta-item"><div class="meta-num">2</div><div class="meta-label">分鐘</div></div>
+      <div class="meta-divider"></div>
+      <div class="meta-item"><div class="meta-num">2</div><div class="meta-label">面向評分</div></div>
+    </div>
+    <button class="btn-start" onclick="startQuiz()">開始檢查　→</button>
+    <p class="intro-fine">這不是醫療診斷，而是幫你初步看見身體狀態</p>
+  </div>
+</section>
+
+<!-- ═══════════ QUIZ ═══════════ -->
+<section class="screen" id="quiz">
+  <div class="quiz-top">
+    <div class="quiz-top-inner">
+      <div class="progress-meta">
+        <span class="progress-label" id="progressLabel">肌力與體能</span>
+        <span class="progress-count" id="progressCount">01 / 10</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+  <div class="quiz-body">
+    <div class="question-card" id="questionCard">
+      <!-- injected -->
+    </div>
+  </div>
+  <div class="quiz-nav">
+    <button class="btn-back" id="btnBack" onclick="goBack()">← 上一題</button>
+    <span></span>
+  </div>
+</section>
+
+<!-- ═══════════ CALCULATING ═══════════ -->
+<section class="screen" id="calc">
+  <div class="calc-inner">
+    <div class="calc-ring">
+      <svg width="100" height="100" viewBox="0 0 100 100">
+        <circle class="calc-track" cx="50" cy="50" r="45"></circle>
+        <circle class="calc-prog" cx="50" cy="50" r="45"></circle>
+      </svg>
+    </div>
+    <div class="calc-text">正在結算你的身體資產…</div>
+    <div class="calc-sub">Calculating your body asset score</div>
+  </div>
+</section>
+
+<!-- ═══════════ RESULT ═══════════ -->
+<section class="screen" id="result">
+  <div class="result-hero">
+    <div class="result-hero-inner">
+      <div class="result-mark">Your Body Asset Report</div>
+      <h2 class="result-headline" id="resultHeadline"></h2>
+      <p class="result-sub">以下是你的身體資產分項報告</p>
+    </div>
+  </div>
+  <div class="result-body">
+    <div class="total-card">
+      <div class="total-label">身體資產總分</div>
+      <div class="total-score" id="totalScore">—</div>
+      <div id="totalGrade"></div>
+      <p class="total-verdict" id="totalVerdict"></p>
+    </div>
+
+    <div class="dim-title">分項評估　Dimension Breakdown</div>
+    <div id="dimCards"></div>
+
+    <div class="result-cta">
+      <div class="cta-inner">
+        <h3 class="cta-title" id="ctaTitle"></h3>
+        <p class="cta-desc" id="ctaDesc"></p>
+        <div class="cta-qr"><img src="line.jpg" style="width: 100%;"></div>
+        <a class="btn-line" href="#" id="lineBtn">加入 Line，取得完整評估　→</a>
+        <p class="cta-fine">我會親自根據你的分數，給你個別化的建議</p>
+      </div>
+    </div>
+
+    <button class="result-restart" onclick="restart()">重新測驗</button>
+    <p class="result-disclaimer">本檢查表僅供健康自我覺察參考，不構成醫療診斷。<br>如有具體健康疑慮，請諮詢專業醫師。</p>
+  </div>
+</section>
+
+<script>
+// ─────────── 題庫 ───────────
+const questions = [
+  // 面向一：肌力與體能（Q1-Q5）
+  { dim:'strength', cat:'肌力與體能', text:'從椅子上站起來，需要用手撐著才能站穩', hint:'想想最近三個月的日常狀況' },
+  { dim:'strength', cat:'肌力與體能', text:'爬三層樓梯後，需要停下來喘氣休息', hint:'以平常的步調上樓來評估' },
+  { dim:'strength', cat:'肌力與體能', text:'提超過 5 公斤的東西時感到吃力', hint:'例如一袋米、一箱水' },
+  { dim:'strength', cat:'肌力與體能', text:'走路超過 30 分鐘後，腳或腿會明顯痠軟', hint:'像是逛街、健走的距離' },
+  { dim:'strength', cat:'肌力與體能', text:'覺得自己的體力和肌肉，比五年前明顯下降', hint:'跟過去的自己比較' },
+  // 面向二：平衡與疼痛（Q6-Q10）
+  { dim:'balance', cat:'平衡與疼痛警訊', text:'走路時感覺重心不穩，或曾經差點跌倒', hint:'包含在不平的路面上' },
+  { dim:'balance', cat:'平衡與疼痛警訊', text:'腰部或下背在日常活動後感到疼痛或緊繃', hint:'例如久坐、彎腰之後' },
+  { dim:'balance', cat:'平衡與疼痛警訊', text:'膝蓋或髖關節在上下樓梯時會痛或卡卡的', hint:'關節活動時的感受' },
+  { dim:'balance', cat:'平衡與疼痛警訊', text:'肩膀或頸部長期緊繃，轉頭或抬手會不舒服', hint:'包含睡醒時的僵硬感' },
+  { dim:'balance', cat:'平衡與疼痛警訊', text:'單腳站立時，很難撐過 10 秒不搖晃', hint:'現在可以扶著桌子試試看' },
+];
+
+const answerOptions = [
+  { label:'幾乎沒有', sub:'score 0', score:0 },
+  { label:'偶爾會有', sub:'score 1', score:1 },
+  { label:'經常出現', sub:'score 2', score:2 },
+];
+
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+
+const screens = { intro:'intro', quiz:'quiz', calc:'calc', result:'result' };
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); }
+
+function startQuiz(){ current=0; answers.fill(null); show('quiz'); renderQuestion(); }
+
+function renderQuestion(){
+  const q = questions[current];
+  const card = document.getElementById('questionCard');
+  card.classList.remove('q-anim'); void card.offsetWidth; card.classList.add('q-anim');
+
+  // progress
+  document.getElementById('progressLabel').textContent = q.cat;
+  document.getElementById('progressCount').textContent = String(current+1).padStart(2,'0') + ' / ' + String(questions.length).padStart(2,'0');
+  document.getElementById('progressFill').style.width = ((current)/questions.length*100) + '%';
+  document.getElementById('btnBack').disabled = (current===0);
+
+  let optionsHTML = answerOptions.map((opt,i)=>`
+    <button class="option" onclick="selectAnswer(${opt.score})">
+      <span class="option-marker">${opt.score}</span>
+      <span class="option-text">${opt.label}<span class="option-sub">${i===0?'幾乎不曾發生':i===1?'偶爾、不頻繁':'時常、明顯感覺到'}</span></span>
+    </button>`).join('');
+
+  card.innerHTML = `
+    <span class="q-category">${q.dim==='strength'?'💪':'⚖️'} ${q.cat}</span>
+    <h2 class="q-text">${q.text}</h2>
+    <p class="q-hint">${q.hint}</p>
+    <div class="options">${optionsHTML}</div>`;
+}
+
+function selectAnswer(score){
+  answers[current] = score;
+  if(current < questions.length-1){ current++; renderQuestion(); }
+  else { finishQuiz(); }
+}
+
+function goBack(){ if(current>0){ current--; renderQuestion(); } }
+
+function finishQuiz(){
+  document.getElementById('progressFill').style.width='100%';
+  show('calc');
+  setTimeout(showResult, 2300);
+}
+
+function showResult(){
+  // 計分
+  let strengthScore=0, balanceScore=0;
+  questions.forEach((q,i)=>{
+    const s = answers[i]||0;
+    if(q.dim==='strength') strengthScore+=s; else balanceScore+=s;
+  });
+  // 每面向 5 題 × 最高 2 分 = 10 分（分數越高代表問題越多）
+  // 轉換成「資產分數」：分數越低越好 → 資產分數越高
+  const strengthAsset = Math.round((1 - strengthScore/10) * 100);
+  const balanceAsset  = Math.round((1 - balanceScore/10) * 100);
+  const totalAsset = Math.round((strengthAsset + balanceAsset)/2);
+  const rawTotal = strengthScore + balanceScore; // 0-20，越高問題越多
+
+  // 總評
+  let grade, gradeClass, verdict, headline, ctaTitle, ctaDesc;
+  if(rawTotal <= 5){
+    grade='資產穩健'; gradeClass='grade-green';
+    headline='你的身體資產，<span class="copper">維持得相當不錯</span>';
+    verdict='你目前的身體狀態維持得很好，這不是偶然，是長期習慣累積的成果。但 45 歲後最大的風險，是「悄悄退化卻沒察覺」——現在正是投資報酬率最高的時機。';
+    ctaTitle='趁狀況好，把優勢鎖住';
+    ctaDesc='你現在的好狀態，是最值得投資的起點。<strong>加我的 Line，我送你一份免費的初步評估</strong>，幫你看清楚身體真正的強項和潛在弱點。';
+  } else if(rawTotal <= 11){
+    grade='需要留意'; gradeClass='grade-amber';
+    headline='你的身體資產，<span class="copper">出現了一些警訊</span>';
+    verdict='你的回覆顯示身體有幾個面向開始退化。這在 45 歲後非常常見，但很多人因為「不痛不癢」就忽略了，等到影響生活才後悔。好消息是——這個階段介入，效果最好。';
+    ctaTitle='現在介入，效果最好';
+    ctaDesc='身體的問題跟股票一樣，<strong>越早處理，損失越小</strong>。加我的 Line，我會根據你的分數，告訴你具體該從哪裡開始。';
+  } else {
+    grade='需優先處理'; gradeClass='grade-red';
+    headline='你的身體資產，<span class="copper">需要認真面對了</span>';
+    verdict='你的回覆顯示身體有多個面向需要優先處理。這些不是危言聳聽，而是這個年齡層最容易被忽視、卻影響最深遠的問題。但請放心——只要方法對，即使現在開始，身體都能明顯改善。';
+    ctaTitle='別再等了，讓我幫你';
+    ctaDesc='我有許多客戶當初狀況跟你類似，系統性處理後 3 個月就有明顯改善。<strong>加我的 Line，我親自幫你安排一次免費的身體評估。</strong>';
+  }
+
+  document.getElementById('resultHeadline').innerHTML = headline;
+  document.getElementById('totalScore').innerHTML = totalAsset + '<small> / 100</small>';
+  document.getElementById('totalGrade').innerHTML = `<span class="total-grade ${gradeClass}">${grade}</span>`;
+  document.getElementById('totalVerdict').textContent = verdict;
+  document.getElementById('ctaTitle').textContent = ctaTitle;
+  document.getElementById('ctaDesc').innerHTML = ctaDesc;
+
+  // 分項卡片
+  const dims = [
+    { icon:'💪', name:'肌力與體能', asset:strengthAsset, raw:strengthScore,
+      good:'你的肌力與體能維持得不錯，繼續保持規律活動即可。',
+      mid:'你的肌力開始出現流失的訊號，建議加入阻力訓練來維持。',
+      bad:'你的肌力與體能有明顯退化，這是跌倒與失能的主要風險，建議盡快介入。' },
+    { icon:'⚖️', name:'平衡與疼痛', asset:balanceAsset, raw:balanceScore,
+      good:'你的平衡感與關節狀況良好，跌倒風險低，維持得很好。',
+      mid:'你的平衡或關節出現一些警訊，針對性訓練可以有效改善。',
+      bad:'你的平衡感與疼痛警訊偏高，跌倒與慢性疼痛風險較大，建議優先處理。' },
+  ];
+  const dimHTML = dims.map(d=>{
+    let color, verdictText;
+    if(d.raw<=3){ color='var(--green)'; verdictText=d.good; }
+    else if(d.raw<=6){ color='var(--amber)'; verdictText=d.mid; }
+    else { color='var(--red)'; verdictText=d.bad; }
+    return `
+      <div class="dim-card">
+        <div class="dim-head">
+          <span class="dim-name"><span class="dim-icon">${d.icon}</span>${d.name}</span>
+          <span class="dim-score" style="color:${color}">${d.asset} / 100</span>
+        </div>
+        <div class="dim-bar-track"><div class="dim-bar-fill" style="background:${color}" data-w="${d.asset}"></div></div>
+        <p class="dim-verdict">${verdictText}</p>
+      </div>`;
+  }).join('');
+  document.getElementById('dimCards').innerHTML = dimHTML;
+
+  show('result');
+  // 動畫：bar 填充
+  setTimeout(()=>{
+    document.querySelectorAll('.dim-bar-fill').forEach(b=>{ b.style.width = b.dataset.w + '%'; });
+  }, 200);
+  // 總分數字動畫
+  animateScore(totalAsset);
+}
+
+function animateScore(target){
+  const el = document.getElementById('totalScore');
+  let n=0; const step = Math.max(1, Math.round(target/40));
+  const timer = setInterval(()=>{
+    n+=step; if(n>=target){ n=target; clearInterval(timer); }
+    el.innerHTML = n + '<small> / 100</small>';
+  }, 30);
+}
+
+function restart(){ show('intro'); }
+
+// 鍵盤支援
+document.addEventListener('keydown', e=>{
+  if(document.getElementById('quiz').classList.contains('active')){
+    if(e.key==='1'||e.key==='0') selectAnswer(0);
+    if(e.key==='2') selectAnswer(1);
+    if(e.key==='3') selectAnswer(2);
+    if(e.key==='Backspace'){ e.preventDefault(); goBack(); }
+  }
+});
+</script>
+</body>
+</html>
